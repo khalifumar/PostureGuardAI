@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // Ganti dari Geist ke Inter
+import { Inter } from "next/font/google"; // Gunakan Inter (Standar & Stabil)
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PostureGuard AI",
-  description: "Protect your posture with AI",
+  description: "Protect your spinal health with AI",
 };
 
 export default function RootLayout({
