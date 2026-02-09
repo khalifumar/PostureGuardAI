@@ -1,122 +1,70 @@
 'use client';
 
-import { useState } from 'react';
-import { supabase } from '@/utils/supabase';
-import { useRouter } from 'next/navigation';
-import { LogIn, UserPlus, Mail, Lock, Loader2, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import MainMonitor from '@/components/monitor/MainMonitor';
+import { Activity, ShieldCheck, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        setError("Registrasi berhasil! Silahkan cek email kamu untuk verifikasi.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        
-        // [UPDATE]: Redirect ke path /monitor sesuai struktur foldermu
-        router.push('/monitor');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan saat autentikasi.');
-    } finally {
-      setLoading(false);
-    }
-  };
+/**
+ * MonitorPage Component
+ * Halaman utama untuk pemantauan postur AI.
+ * Pastikan fungsi ini di-export sebagai default agar dikenali oleh Next.js.
+ */
+export default function MonitorPage() {
+  const [status, setStatus] = useState<'GOOD' | 'SLOUCHING'>('GOOD');
+  const [angle, setAngle] = useState(0);
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-slate-900 rounded-[3rem] shadow-2xl p-8 md:p-12 border border-white/5 relative overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto space-y-8">
         
-        {/* Glow Effect */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-600/20 rounded-full blur-[80px]" />
-        
-        <div className="text-center mb-10 relative">
-          <div className="inline-flex p-4 bg-indigo-600/10 rounded-2xl mb-4 border border-indigo-500/20">
-            <Sparkles className="w-8 h-8 text-indigo-400" />
+        {/* Header Dashboard */}
+        <div className="flex items-center justify-between bg-slate-900/50 p-6 rounded-[2rem] border border-white/5 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-2 hover:bg-white/5 rounded-xl transition-colors">
+              <ArrowLeft className="text-slate-400" size={20} />
+            </Link>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                <Activity className="text-indigo-500" />
+                PostureGuard <span className="text-indigo-500">AI</span>
+              </h1>
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                Active Protection Mode
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl font-black text-white tracking-tight">
-            {isSignUp ? 'Join PostureGuard' : 'Welcome Back'}
-          </h1>
-          <p className="text-slate-500 mt-2 text-sm font-medium">
-            Smart AI monitoring for your daily productivity.
+          
+          <div className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] border transition-all duration-500 ${
+            status === 'GOOD' 
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+              : 'bg-red-500/10 text-red-400 border-red-500/20 animate-pulse'
+          }`}>
+            Status: {status}
+          </div>
+        </div>
+
+        {/* AI Camera Section */}
+        <div className="relative">
+          <MainMonitor 
+            onStatusChange={setStatus} 
+            onAngleChange={setAngle} 
+          />
+        </div>
+
+        {/* Privacy & Tech Info */}
+        <div className="flex flex-col items-center gap-2 text-slate-600">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={14} className="text-emerald-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Secured by Local AI Processing
+            </span>
+          </div>
+          <p className="text-[9px] text-slate-700 max-w-xs text-center leading-relaxed">
+            No video data leaves your device. Calculations are performed locally using MediaPipe WASM.
           </p>
         </div>
-
-        <form onSubmit={handleAuth} className="space-y-5 relative">
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600" />
-              <input
-                type="email"
-                required
-                className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-white/5 rounded-2xl text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600"
-                placeholder="name@binus.ac.id"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600" />
-              <input
-                type="password"
-                required
-                className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-white/5 rounded-2xl text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-600"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className={`p-4 rounded-xl text-xs font-bold ${error.includes('berhasil') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black tracking-widest text-sm shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center disabled:opacity-50 active:scale-95"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : isSignUp ? (
-              <>CREATE ACCOUNT</>
-            ) : (
-              'ENTER MONITORING'
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center relative">
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-400 transition-colors"
-          >
-            {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
-          </button>
-        </div>
       </div>
-    </div>
+    </main>
   );
 }
