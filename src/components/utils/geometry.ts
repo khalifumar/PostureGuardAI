@@ -17,13 +17,13 @@ export const calculateDistance = (p1: Point, p2: Point): number => {
  * * Rumus: Jarak(MulutTengah ke BahuTengah) / LebarBahu
  */
 export const calculateCompressionRatio = (
-  mouthMid: Point, 
-  shoulderMid: Point, 
+  mouthMid: Point,
+  shoulderMid: Point,
   shoulderWidth: number
 ): number => {
   // Kita hanya peduli jarak vertikal (sumbu Y) untuk kompresi
   const verticalDistance = Math.abs(mouthMid.y - shoulderMid.y);
-  
+
   // Hindari pembagian dengan nol jika bahu tidak terdeteksi
   if (shoulderWidth === 0) return 1.0;
 
@@ -31,3 +31,26 @@ export const calculateCompressionRatio = (
 };
 
 // ... biarkan fungsi calculateNeckAngle yang lama tetap ada di bawahnya
+
+/**
+ * Menghitung sudut kemiringan leher (Neck Angle)
+ * Berdasarkan posisi telinga (ear) dan bahu (shoulder).
+ * Menggunakan atan2 untuk menghitung sudut garis penghubung relatif terhadap sumbu vertikal.
+ * 0 derajat = tegak lurus (ear.x == shoulder.x)
+ */
+export const calculateNeckAngle = (ear: Point, shoulder: Point): number => {
+  const dx = ear.x - shoulder.x;
+  const dy = ear.y - shoulder.y; // y increases downwards in image coords
+
+  // Angle in radians relative to horizontal
+  const angleRad = Math.atan2(dy, dx);
+
+  // Convert to degrees
+  let angleDeg = angleRad * (180 / Math.PI);
+
+  // Adjust so that -90 degrees (up) becomes 0 degrees
+  // We want deviation from vertical.
+  let neckAngle = angleDeg + 90;
+
+  return neckAngle;
+};

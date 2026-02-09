@@ -2,11 +2,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import React from 'react';
 import Webcam from 'react-webcam';
+import { calculateNeckAngle } from '../../utils/geometry';
 import { usePoseDetection } from '../../hooks/usePoseDetection';
-import { calculateAngle } from '../utils/geometry';
 import CameraView from './CameraView';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { POSE_CONNECTIONS, Results } from '@mediapipe/pose';
+
+
 
 // Warna untuk indikator
 const COLOR_GOOD = '#22c55e'; // Green-500
@@ -47,7 +49,7 @@ export default function PostureMonitor() {
             const leftEar = results.poseLandmarks[7];
             const leftShoulder = results.poseLandmarks[11];
             if (leftEar && leftShoulder) {
-                const currentAngle = calculateAngle(leftEar, leftShoulder);
+                const currentAngle = calculateNeckAngle(leftEar, leftShoulder);
                 if (Math.abs(currentAngle) > 20) lineColor = COLOR_BAD;
             }
         }
@@ -83,7 +85,7 @@ export default function PostureMonitor() {
         const leftShoulder = results.poseLandmarks[11];
 
         if (leftEar && leftShoulder) {
-            const currentAngle = calculateAngle(leftEar, leftShoulder);
+            const currentAngle = calculateNeckAngle(leftEar, leftShoulder);
             setAngle(currentAngle);
 
             if (Math.abs(currentAngle) > 20) {
