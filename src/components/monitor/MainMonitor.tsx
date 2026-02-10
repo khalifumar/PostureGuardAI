@@ -168,11 +168,16 @@ export default function MainMonitor({ onStatusChange, onAngleChange }: MainMonit
   /**
    * Frame Loop
    */
+  /**
+   * Frame Loop (Standard 60 FPS)
+   */
   useEffect(() => {
     let animationFrameId: number;
+
     const runInference = async () => {
       if ((hasStarted || isLoading) && webcamRef.current?.video?.readyState === 4 && poseFn) {
         try {
+          // Send frame to MediaPipe
           await poseFn.send({ image: webcamRef.current.video });
         } catch (error) {
           console.error("AI Error:", error);
@@ -180,13 +185,17 @@ export default function MainMonitor({ onStatusChange, onAngleChange }: MainMonit
       }
       animationFrameId = requestAnimationFrame(runInference);
     };
+
     runInference();
-    return () => cancelAnimationFrame(animationFrameId);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [hasStarted, isLoading, poseFn]);
 
   return (
     <div className="relative group overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border-4 border-white/10">
-      
+
       {/* START OVERLAY */}
       {!hasStarted && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md transition-all duration-500">
@@ -198,7 +207,7 @@ export default function MainMonitor({ onStatusChange, onAngleChange }: MainMonit
             <p className="text-indigo-200/60 text-sm mb-8 max-w-xs mx-auto">
               Sensor ditingkatkan: Sekarang mendeteksi bungkuk vertikal menggunakan titik mulut.
             </p>
-            <button 
+            <button
               onClick={startMonitoring}
               className="bg-white text-slate-900 px-10 py-4 rounded-2xl font-black tracking-widest text-sm transition-all hover:bg-indigo-500 hover:text-white active:scale-95 shadow-xl"
             >
@@ -214,9 +223,8 @@ export default function MainMonitor({ onStatusChange, onAngleChange }: MainMonit
       <div className="absolute top-6 right-6 z-40 opacity-0 group-hover:opacity-100 transition-all duration-300 transform">
         <button
           onClick={toggleSound}
-          className={`flex items-center space-x-2 px-6 py-3 rounded-2xl shadow-2xl font-black text-sm uppercase tracking-widest transition-all ${
-            isSoundEnabled ? 'bg-indigo-600 text-white scale-105' : 'bg-white/90 backdrop-blur-md text-slate-600'
-          }`}
+          className={`flex items-center space-x-2 px-6 py-3 rounded-2xl shadow-2xl font-black text-sm uppercase tracking-widest transition-all ${isSoundEnabled ? 'bg-indigo-600 text-white scale-105' : 'bg-white/90 backdrop-blur-md text-slate-600'
+            }`}
         >
           {isSoundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
           <span>{isSoundEnabled ? 'Alarm On' : 'Alarm Muted'}</span>

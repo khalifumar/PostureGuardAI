@@ -20,8 +20,8 @@ export default function CameraView({ webcamRef, canvasRef }: CameraViewProps) {
         className="absolute top-0 left-0 w-full h-full object-cover"
         videoConstraints={{
           facingMode: "user",
-          width: 1280,
-          height: 720,
+          width: 640,
+          height: 480,
         }}
       />
 
