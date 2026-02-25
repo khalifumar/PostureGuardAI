@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "PostureGuard AI",
-  description: "Real-time AI posture protection for developers",
+  description: "Real-time AI posture protection",
 };
 
 export default function RootLayout({
